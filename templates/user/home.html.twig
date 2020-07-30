@@ -1,0 +1,9 @@
+{% extends 'base.html.twig' %}
+{% block title %}Contactbook{% endblock %}
+{% block body %}
+
+    <h1 class="text-capitalize">{{ user.email|split('@')[0] }}'s Contactbook</h1>
+
+    <a href="/logout">logout</a>
+
+{% endblock %}
