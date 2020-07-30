@@ -1,7 +1,8 @@
 <?php
 
 namespace App\Controller;
-
+use App\Entity\User;
+use App\Entity\Contact;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
@@ -11,7 +12,7 @@ class UserController extends AbstractController
 {
     private $passwordEncoder;
 
-    public function _construct(UserPasswordEncoderInterface $passwordEncoder)
+    public function __construct(UserPasswordEncoderInterface $passwordEncoder)
     {
         $this->passwordEncoder = $passwordEncoder;
     }
@@ -32,12 +33,12 @@ class UserController extends AbstractController
         $user = $this->getUser();
         return $this->render('user/index.html.twig', [
             'user' => $user,
-            'contacts' => $user->getContact()
+            'contacts' => $user->getContacts()
         ]);
     }
 
     /**
-     * @Route("/user/{id}/contact", name="contact_create", methods={"POST"})
+     * @Route("/user/", name="contactbook_create", methods={"POST"})
      */
     public function create(Request $request)
     {
@@ -50,7 +51,7 @@ class UserController extends AbstractController
         } else {
             $user = new User();
             $user->setEmail($request->request->get('email'));
-            $user->setPassword($request->passwordEncoder->encodePassword($user, $password));
+            $user->setPassword($this->passwordEncoder->encodePassword($user, $password));
             $entityManager->persist($user);
             $entityManager->flush();
             return $this->redirectToRoute('app_login');
@@ -67,7 +68,7 @@ class UserController extends AbstractController
         $contact = new Contact();
         $contact->setName($request->request->get('name'));
         $contact->setTel($request->request->get('tel'));
-        $contact->setUser($user);
+        $contact->setUserId($user->getEmail());
         $entityManager->persist($contact);
         $entityManager->flush();
         return $this->redirectToRoute('contactbook', ['id' => $user->getId()]);
